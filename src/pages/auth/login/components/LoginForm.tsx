@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
@@ -14,9 +15,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+import { useAuth } from "@/hooks/useAuth";
+
 import { loginSchema, type LoginSchemaType } from "@/validators/auth-validator";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
+  const { login, accessToken } = useAuth();
+
+  console.log(accessToken);
+
   const [isView, setIsView] = useState(false);
 
   const form = useForm<LoginSchemaType>({
@@ -28,7 +36,11 @@ const LoginForm = () => {
   });
 
   const onSubmit = (value: LoginSchemaType) => {
-    console.log(value);
+    login.mutate(value, {
+      onSuccess: () => {
+        navigate("/dashboard");
+      },
+    });
   };
 
   return (
