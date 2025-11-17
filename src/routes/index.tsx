@@ -1,9 +1,17 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router";
 
 import LoginPage from "@/pages/auth/login";
 import DashboardPage from "@/pages/dashboard";
 
-import { ProtectedRoute } from "@/components/ProtectRoute";
+import { useAuth } from "@/hooks/useAuth";
+
+const ProtectedRoute = () => {
+  const { accessToken } = useAuth();
+
+  if (!accessToken) return <Navigate to="/login" />;
+
+  return <Outlet />;
+};
 
 const Router = () => {
   return (
