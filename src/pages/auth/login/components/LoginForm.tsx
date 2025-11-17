@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
@@ -85,22 +84,10 @@ const LoginForm = () => {
               </FormItem>
             )}
           />
-          <Link
-            to="#"
-            className="text-sm inline-block font-light text-blue-500 underline"
-          >
-            Forgot password?
-          </Link>
-          <Button type="submit" className="w-full" size="lg">
+          <Button type="submit" className="w-full mt-4" size="lg">
             Login
           </Button>
         </form>
-        <div className="text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link to="/register" className="underline text-blue-500">
-            Register
-          </Link>
-        </div>
       </div>
     </Form>
   );
