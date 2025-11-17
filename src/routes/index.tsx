@@ -1,9 +1,13 @@
-import { BrowserRouter, Routes } from "react-router";
+import { BrowserRouter, Routes, Route } from "react-router";
+
+import LoginPage from "@/pages/auth/login";
 
 const Router = () => {
   return (
     <BrowserRouter>
-      <Routes></Routes>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
     </BrowserRouter>
   );
 };
