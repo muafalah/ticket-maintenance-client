@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { ChevronRight, CircleUserRound, Ticket } from "lucide-react";
+import { ChevronRight, CircleUserRound, House, Ticket } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -18,16 +18,40 @@ import {
 } from "@/components/ui/collapsible";
 
 import { cn } from "@/lib/utils";
-import { CATEGORIES } from "@/lib/constants";
 
-const navList = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const NAV_TICKET_LIST = [
+  {
+    title: "IMT",
+    url: "/ticket/IMT",
+  },
+  {
+    title: "SWT",
+    url: "/ticket/SWT",
+  },
+  {
+    title: "CMT",
+    url: "/ticket/CMT",
+  },
+  {
+    title: "CTT",
+    url: "/ticket/CTT",
+  },
+];
+
+const NAV_LIST = [
   {
     groupTitle: "Menu",
     menu: [
       {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: House,
+      },
+      {
         title: "My Tickets",
         icon: Ticket,
-        items: CATEGORIES,
+        items: NAV_TICKET_LIST,
       },
       {
         title: "Profile",
@@ -44,7 +68,7 @@ export const NavMain = () => {
 
   return (
     <>
-      {navList.map(({ groupTitle, menu }) => (
+      {NAV_LIST.map(({ groupTitle, menu }) => (
         <SidebarGroup key={groupTitle}>
           <SidebarGroupLabel>{groupTitle}</SidebarGroupLabel>
           <SidebarMenu>

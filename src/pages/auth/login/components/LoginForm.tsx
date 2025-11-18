@@ -21,10 +21,7 @@ import { loginSchema, type LoginSchemaType } from "@/validators/auth-validator";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const { login, accessToken } = useAuth();
-
-  console.log(accessToken);
-
+  const { login } = useAuth();
   const [isView, setIsView] = useState(false);
 
   const form = useForm<LoginSchemaType>({

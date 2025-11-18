@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { QueryClient } from "@tanstack/react-query";
 
-export const queryClient = new QueryClient();
+import { queryClient } from "@/providers/QueryProvider";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -14,7 +13,16 @@ const refreshApi = axios.create({
   withCredentials: true,
 });
 
-// Flag to prevent infinite loop
+// always inject token
+api.interceptors.request.use((config) => {
+  const token = queryClient.getQueryData(["accessToken"]);
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 let isRefreshing = false;
 let failedQueue: any[] = [];
 
@@ -37,6 +45,7 @@ api.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         }).then((token) => {
+          original.headers = original.headers || {};
           original.headers.Authorization = `Bearer ${token}`;
           return api(original);
         });
@@ -47,14 +56,18 @@ api.interceptors.response.use(
 
       try {
         const { data } = await refreshApi.post("/auth/refresh-token");
-
         const accessToken = data?.data?.accessToken;
 
+        // save token
         queryClient.setQueryData(["accessToken"], accessToken);
+
+        // update axios defaults
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
         processQueue(null, accessToken);
         isRefreshing = false;
 
+        original.headers = original.headers || {};
         original.headers.Authorization = `Bearer ${accessToken}`;
         return api(original);
       } catch (refreshErr) {
@@ -62,9 +75,9 @@ api.interceptors.response.use(
         isRefreshing = false;
 
         localStorage.removeItem("accessToken");
-
         queryClient.clear();
         window.location.href = "/login";
+
         return Promise.reject(refreshErr);
       }
     }
