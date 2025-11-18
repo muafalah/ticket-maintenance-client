@@ -1,3 +1,5 @@
+import moment from "moment";
+// import "moment/locale/id";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -14,4 +16,11 @@ export const getInitial = (name: string) => {
   }
 
   return words.map((word) => word[0]?.toUpperCase()).join("");
+};
+
+export const formatDateTime = (
+  isoString: string,
+  format: string = "DD MMM YYYY, hh:mm A"
+) => {
+  return moment(isoString).utc().format(format);
 };
