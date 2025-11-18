@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,15 +35,12 @@ import { DateTimePicker } from "@/components/ui/date-time";
 import { SlateEditor } from "@/components/ui/slate-editor";
 import FilesUploader from "@/components/ui/files-uploader";
 
-import { createTicketApi } from "@/services/ticket";
+import { createTicketApi, updateTicketByIdApi } from "@/services/ticket";
 
 import { queryClient } from "@/providers/QueryProvider";
 
 import {
   createTicketSchema,
-  TicketCategoryEnum,
-  TicketPriorityEnum,
-  TicketStatusEnum,
   type CreateTicketSchemaType,
 } from "@/validators/ticket-validator";
 
@@ -54,18 +51,45 @@ import {
 } from "@/lib/constants";
 
 export const TicketFormDialog = ({
+  id,
+  initData,
   open,
   setOpen,
 }: {
+  id?: string;
+  initData?: CreateTicketSchemaType | undefined;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const { mutate, isPending } = useMutation({
+  const { mutate: mutateCreate, isPending: isPendingCreate } = useMutation({
     mutationFn: (formData: FormData) => createTicketApi(formData),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["getTickets"] });
+      queryClient.invalidateQueries({ queryKey: ["getTicketById"] });
+
       form.reset();
       setOpen(false);
+
+      toast.success(data.message);
+    },
+    onError: (err) => {
+      if (err instanceof AxiosError) {
+        toast.error(err.response?.data?.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    },
+  });
+
+  const { mutate: mutateUpdate, isPending: isPendingUpdate } = useMutation({
+    mutationFn: (formData: FormData) => updateTicketByIdApi(id!, formData),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["getTickets"] });
+      queryClient.invalidateQueries({ queryKey: ["getTicketById"] });
+
+      form.reset();
+      setOpen(false);
+
       toast.success(data.message);
     },
     onError: (err) => {
@@ -80,14 +104,16 @@ export const TicketFormDialog = ({
   const form = useForm<CreateTicketSchemaType>({
     resolver: zodResolver(createTicketSchema),
     defaultValues: {
-      category: TicketCategoryEnum.IMT,
-      title: "",
-      status: TicketStatusEnum.NEW,
-      priority: TicketPriorityEnum.LOW,
-      description: "",
-      reporterName: "",
-      reporterContact: "",
-      expectedCompletion: undefined,
+      category: initData?.category || "IMT",
+      title: initData?.title || "",
+      status: initData?.status || "NEW",
+      priority: initData?.priority || "LOW",
+      description: initData?.description || "",
+      reporterName: initData?.reporterName || "",
+      reporterContact: initData?.reporterContact || "",
+      expectedCompletion: initData?.expectedCompletion
+        ? new Date(initData.expectedCompletion)
+        : undefined,
       attachments: [],
     },
   });
@@ -113,10 +139,14 @@ export const TicketFormDialog = ({
       });
     }
 
-    mutate(formData);
+    if (initData) {
+      mutateUpdate(formData);
+    } else {
+      mutateCreate(formData);
+    }
   };
 
-  const disabled = isPending;
+  const disabled = isPendingCreate || isPendingUpdate;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -124,7 +154,9 @@ export const TicketFormDialog = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <DialogHeader>
-              <DialogTitle>Create New Ticket</DialogTitle>
+              <DialogTitle>
+                {initData ? "Update" : "Create New"} Ticket
+              </DialogTitle>
               <DialogDescription>
                 You can raise a request for Support
               </DialogDescription>
@@ -138,7 +170,11 @@ export const TicketFormDialog = ({
                     <FormItem>
                       <FormLabel>Project Name</FormLabel>
                       <FormControl>
-                        <Select {...field} disabled={disabled}>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          disabled={disabled}
+                        >
                           <SelectTrigger className="w-full cursor-pointer">
                             <SelectValue placeholder="Choose project name..." />
                           </SelectTrigger>
@@ -181,7 +217,11 @@ export const TicketFormDialog = ({
                       <FormItem>
                         <FormLabel>Ticket Status</FormLabel>
                         <FormControl>
-                          <Select {...field} disabled={disabled}>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={disabled}
+                          >
                             <SelectTrigger className="w-full cursor-pointer">
                               <SelectValue placeholder="Choose ticket status..." />
                             </SelectTrigger>
@@ -205,7 +245,11 @@ export const TicketFormDialog = ({
                       <FormItem>
                         <FormLabel>Priority Level</FormLabel>
                         <FormControl>
-                          <Select {...field} disabled={disabled}>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={disabled}
+                          >
                             <SelectTrigger className="w-full cursor-pointer">
                               <SelectValue placeholder="Choose priority level..." />
                             </SelectTrigger>
@@ -241,23 +285,25 @@ export const TicketFormDialog = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="attachments"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Attachments</FormLabel>
-                      <FormControl>
-                        <FilesUploader
-                          value={field.value || []}
-                          onValueChange={field.onChange}
-                          disabled={disabled}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!initData && (
+                  <FormField
+                    control={form.control}
+                    name="attachments"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Attachments</FormLabel>
+                        <FormControl>
+                          <FilesUploader
+                            value={field.value || []}
+                            onValueChange={field.onChange}
+                            disabled={disabled}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <Separator />
                 <div className="grid md:grid-cols-2 gap-4">
                   <FormField

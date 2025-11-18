@@ -9,7 +9,22 @@ export const getTicketsApi = async (params: TicketQuerySchemaType) => {
   return res.data;
 };
 
+export const getTicketByIdApi = async (id: string) => {
+  const res = await api.get(`/ticket/${id}`);
+  return res.data;
+};
+
 export const createTicketApi = async (body: FormData) => {
   const res = await api.post("/ticket", body);
+  return res.data;
+};
+
+export const updateTicketByIdApi = async (id: string, body: FormData) => {
+  const res = await api.put(`/ticket/${id}`, body);
+  return res.data;
+};
+
+export const deleteTicketByIdApi = async (id: string) => {
+  const res = await api.delete(`/ticket/${id}`);
   return res.data;
 };

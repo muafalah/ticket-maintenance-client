@@ -1,18 +1,34 @@
+/* eslint-disable react-refresh/only-export-components */
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import type { ColumnDef } from "@tanstack/react-table";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Eye, SquarePen, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
+import { queryClient } from "@/providers/QueryProvider";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { DialogConfirm } from "@/components/ui/dialog-confirm";
+import { buttonVariants } from "@/components/ui/button";
 
-import {
+import { deleteTicketByIdApi, getTicketByIdApi } from "@/services/ticket";
+
+import type {
   TicketCriticalityEnum,
   TicketLevelEnum,
-  type TicketPriorityEnum,
-  type TicketStatusEnum,
+  TicketPriorityEnum,
+  TicketStatusEnum,
 } from "@/validators/ticket-validator";
+
 import { formatDateTime, getInitial } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import { TicketFormDialog } from "./ticket-form-dialog";
 
 export type ListTicketType = {
-  id: string;
+  _id: string;
   code: string;
   name: string;
   title: string;
@@ -115,7 +131,7 @@ export const columns = (
     cell: ({ row }) => {
       const reporterName = row.getValue("reporterName") as string;
 
-      return reporterName || "-";
+      return reporterName?.length > 0 ? reporterName : "-";
     },
   },
   {
@@ -127,7 +143,7 @@ export const columns = (
       ) as ListTicketType["assignedTo"];
 
       return assignedTo ? (
-        <div className="relative flex items-center h-12 w-12">
+        <div className="relative flex items-center">
           <Avatar className="h-8 w-8 rounded-full me-2">
             <AvatarImage
               src={assignedTo?.profilePicture}
@@ -144,4 +160,82 @@ export const columns = (
       );
     },
   },
+  {
+    id: "action",
+    header: "Action",
+    cell: ({ row }) => {
+      return <ActionButton key={row.original._id} id={row.original._id} />;
+    },
+  },
 ];
+
+const ActionButton = ({ id }: { id: string }) => {
+  const navigate = useNavigate();
+
+  const [isOpenModalUpdate, setOpenModalUpdate] = useState(false);
+  const [isOpenModalDelete, setOpenModalDelete] = useState(false);
+
+  const { data: ticketData } = useQuery({
+    queryKey: ["getTicketById", id],
+    queryFn: () => getTicketByIdApi(id!),
+    enabled: !!id && isOpenModalUpdate,
+  });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: () => deleteTicketByIdApi(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["getTickets"] });
+      toast.success(data.message);
+    },
+    onError: (err) => {
+      if (err instanceof AxiosError) {
+        toast.error(err.response?.data?.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    },
+    onSettled: () => {
+      setOpenModalDelete(false);
+    },
+  });
+
+  return (
+    <>
+      <div className="flex gap-4">
+        <Eye
+          onClick={() => navigate(`/ticket-detail/${id}`)}
+          className="size-4 cursor-pointer"
+        />
+        <SquarePen
+          onClick={() => setOpenModalUpdate(true)}
+          className="size-4 cursor-pointer"
+        />
+        <Trash2
+          onClick={() => setOpenModalDelete(true)}
+          className="size-4 cursor-pointer text-red-500"
+        />
+      </div>
+      {isOpenModalUpdate && ticketData?.data && (
+        <TicketFormDialog
+          key={ticketData?.data._id}
+          id={id}
+          initData={ticketData.data}
+          open={isOpenModalUpdate}
+          setOpen={setOpenModalUpdate}
+        />
+      )}
+      {isOpenModalDelete && (
+        <DialogConfirm
+          isOpen={isOpenModalDelete}
+          setOpen={setOpenModalDelete}
+          isLoading={isPending}
+          title="Are you sure you want to delete it?"
+          description="This action cannot be undone. This will permanently delete your ticket."
+          confirmBtnLabel="Delete"
+          confirmBtnClassName={buttonVariants({ variant: "destructive" })}
+          onConfirm={() => mutate()}
+        />
+      )}
+    </>
+  );
+};

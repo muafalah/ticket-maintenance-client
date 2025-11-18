@@ -1,44 +1,29 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import z from "zod";
 
 import { paginationSchema, sorterSchema } from "./global-validator";
 
-export enum TicketCategoryEnum {
-  IMT = "IMT",
-  SWT = "SWT",
-  CMT = "CMT",
-  CTT = "CTT",
-}
+const TicketCategory = ["IMT", "SWT", "CMT", "CTT"] as const;
+export type TicketCategoryEnum = (typeof TicketCategory)[number];
 
-export enum TicketPriorityEnum {
-  LOW = "LOW",
-  MEDIUM = "MEDIUM",
-  HIGH = "HIGH",
-}
+const TicketPriority = ["LOW", "MEDIUM", "HIGH"] as const;
+export type TicketPriorityEnum = (typeof TicketPriority)[number];
 
-export enum TicketStatusEnum {
-  NEW = "NEW",
-  ATTENDING = "ATTENDING",
-  COMPLETED = "COMPLETED",
-}
+const TicketStatus = ["NEW", "ATTENDING", "COMPLETED"] as const;
+export type TicketStatusEnum = (typeof TicketStatus)[number];
 
-export enum TicketLevelEnum {
-  L1 = "L1",
-  L2 = "L2",
-  L3 = "L3",
-}
+const TicketLevel = ["L1", "L2", "L3"] as const;
+export type TicketLevelEnum = (typeof TicketLevel)[number];
 
-export enum TicketCriticalityEnum {
-  C1 = "C1",
-  C2 = "C2",
-  C3 = "C3",
-}
+const TicketCriticality = ["C1", "C2", "C3"] as const;
+export type TicketCriticalityEnum = (typeof TicketCriticality)[number];
 
 export const ticketFilterSchema = z.object({
   keyword: z.string().optional(),
-  category: z.enum(TicketCategoryEnum).optional(),
-  status: z.enum(TicketStatusEnum).optional(),
-  priority: z.enum(TicketPriorityEnum).optional(),
-  level: z.enum(TicketLevelEnum).optional(),
+  category: z.enum(TicketCategory).optional(),
+  status: z.enum(TicketStatus).optional(),
+  priority: z.enum(TicketPriority).optional(),
+  level: z.enum(TicketLevel).optional(),
 });
 
 export const ticketQuerySchema = ticketFilterSchema
@@ -50,9 +35,15 @@ export const baseTicketSchema = z.object({
   description: z.string().optional(),
   expectedCompletion: z.date({ message: "Date & Time is required" }),
 
-  category: z.enum(TicketCategoryEnum),
-  priority: z.enum(TicketPriorityEnum),
-  status: z.enum(TicketStatusEnum),
+  category: z.enum(TicketCategory, {
+    message: "Category is required",
+  }),
+  priority: z.enum(TicketPriority, {
+    message: "Priority is required",
+  }),
+  status: z.enum(TicketStatus, {
+    message: "Status is required",
+  }),
 
   reporterName: z.string().optional(),
   reporterContact: z.string().optional(),
