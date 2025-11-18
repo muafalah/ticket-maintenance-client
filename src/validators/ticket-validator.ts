@@ -27,6 +27,12 @@ export enum TicketLevelEnum {
   L3 = "L3",
 }
 
+export enum TicketCriticalityEnum {
+  C1 = "C1",
+  C2 = "C2",
+  C3 = "C3",
+}
+
 export const ticketFilterSchema = z.object({
   keyword: z.string().optional(),
   category: z.enum(TicketCategoryEnum).optional(),
@@ -51,14 +57,7 @@ export const baseTicketSchema = z.object({
   reporterName: z.string().optional(),
   reporterContact: z.string().optional(),
 
-  attachments: z
-    .array(
-      z.object({
-        name: z.string(),
-        url: z.string(),
-      })
-    )
-    .optional(),
+  attachments: z.array(z.any()).optional(),
 });
 
 export const createTicketSchema = baseTicketSchema;

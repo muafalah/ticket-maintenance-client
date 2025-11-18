@@ -2,10 +2,11 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { Badge } from "@/components/ui/badge";
 
-import type {
+import {
+  TicketCriticalityEnum,
   TicketLevelEnum,
-  TicketPriorityEnum,
-  TicketStatusEnum,
+  type TicketPriorityEnum,
+  type TicketStatusEnum,
 } from "@/validators/ticket-validator";
 import { formatDateTime, getInitial } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -18,6 +19,7 @@ export type ListTicketType = {
   status: TicketStatusEnum;
   level: TicketLevelEnum;
   priority: TicketPriorityEnum;
+  criticality: TicketCriticalityEnum;
   expectedCompletion: string;
   assignedTo: {
     id: string;
@@ -89,12 +91,11 @@ export const columns = (
     enableSorting: true,
     cell: ({ row }) => {
       const priority = row.getValue("priority") as TicketPriorityEnum;
-      const criticality = row.getValue("criticality")
-        ? `${row.getValue("criticality")}`
-        : "";
+      const criticality = row.original.criticality as TicketCriticalityEnum;
+
       return (
         <Badge variant="outline" className="rounded-sm">
-          {`${priority} ${criticality}`}
+          {`${priority} (${criticality})`}
         </Badge>
       );
     },

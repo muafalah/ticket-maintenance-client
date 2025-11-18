@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { DateTimePicker } from "@/components/ui/date-time";
+import { SlateEditor } from "@/components/ui/slate-editor";
+import FilesUploader from "@/components/ui/files-uploader";
 
 import { createTicketApi } from "@/services/ticket";
 
@@ -59,7 +61,7 @@ export const TicketFormDialog = ({
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { mutate, isPending } = useMutation({
-    mutationFn: createTicketApi,
+    mutationFn: (formData: FormData) => createTicketApi(formData),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["getTickets"] });
       form.reset();
@@ -82,21 +84,43 @@ export const TicketFormDialog = ({
       title: "",
       status: TicketStatusEnum.NEW,
       priority: TicketPriorityEnum.LOW,
+      description: "",
       reporterName: "",
       reporterContact: "",
       expectedCompletion: undefined,
+      attachments: [],
     },
   });
 
   const onSubmit = (value: CreateTicketSchemaType) => {
-    mutate(value);
+    const formData = new FormData();
+
+    formData.append("category", value.category);
+    formData.append("title", value.title);
+    formData.append("status", value.status);
+    formData.append(
+      "expectedCompletion",
+      value.expectedCompletion?.toISOString()
+    );
+    formData.append("priority", value.priority);
+    formData.append("description", value.description!);
+    formData.append("reporterName", value.reporterName!);
+    formData.append("reporterContact", value.reporterContact!);
+
+    if (value.attachments && value.attachments.length > 0) {
+      value.attachments.forEach((file) => {
+        formData.append("attachments", file);
+      });
+    }
+
+    mutate(formData);
   };
 
   const disabled = isPending;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-auto">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <DialogHeader>
@@ -199,6 +223,41 @@ export const TicketFormDialog = ({
                     )}
                   />
                 </div>
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <SlateEditor
+                          value={field.value}
+                          onChange={field.onChange}
+                          disabled={disabled}
+                          placeholder="Type your type description..."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="attachments"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Attachments</FormLabel>
+                      <FormControl>
+                        <FilesUploader
+                          value={field.value || []}
+                          onValueChange={field.onChange}
+                          disabled={disabled}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <Separator />
                 <div className="grid md:grid-cols-2 gap-4">
                   <FormField
