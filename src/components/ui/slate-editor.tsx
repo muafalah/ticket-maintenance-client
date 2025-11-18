@@ -30,7 +30,7 @@ const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
 interface SlateEditorProps {
   value?: string; // JSON string
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
 }
@@ -68,13 +68,18 @@ export const SlateEditor = ({
     const isAstChange = editor.operations.some(
       (op) => "set_selection" !== op.type
     );
-    if (isAstChange) {
+    if (isAstChange && onChange) {
       onChange(JSON.stringify(val));
     }
   };
 
   return (
-    <div className="w-full rounded-md border border-input bg-background shadow-xs">
+    <div
+      className={cn(
+        disabled && "border-none rounded-md",
+        "w-full rounded-md border border-input bg-background shadow-xs"
+      )}
+    >
       <Slate
         editor={editor}
         initialValue={initialValue}
@@ -118,11 +123,15 @@ export const SlateEditor = ({
         <Editable
           renderElement={renderElement}
           renderLeaf={renderLeaf}
-          placeholder={placeholder || "Type something..."}
+          placeholder={
+            disabled ? "No content" : placeholder || "Type something..."
+          }
           readOnly={disabled}
           className={cn(
-            "min-h-[150px] w-full p-4 text-sm focus-visible:outline-none",
-            disabled && "cursor-not-allowed opacity-50"
+            "w-full p-4 text-sm focus-visible:outline-none",
+            disabled
+              ? "cursor-not-allowed bg-muted/90 opacity-70 rounded-md"
+              : "min-h-[150px] "
           )}
           // Tambahkan Shortcut Keyboard
           onKeyDown={(event) => {
@@ -254,7 +263,7 @@ const Element = ({ attributes, children, element }: any) => {
       );
     default:
       return (
-        <p {...attributes} className="leading-7 [&:not(:first-child)]:mt-6">
+        <p {...attributes} className="leading-7 not-first:mt-6">
           {children}
         </p>
       );

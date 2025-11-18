@@ -23,6 +23,12 @@ export const TICKET_CATEGORY = [
   { value: "CTT", label: "CTT" },
 ];
 
+export const TICKET_CRITICALITY = [
+  { value: "C1", label: "C1 (High)" },
+  { value: "C2", label: "C2 (Medium)" },
+  { value: "C3", label: "C3 (Low)" },
+];
+
 export const DEFAULT_PAGINATION = {
   pageIndex: 1,
   pageSize: 10,

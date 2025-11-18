@@ -6,6 +6,8 @@ import { currentUserApi, loginApi, logoutApi } from "@/services/auth";
 
 import type { LoginSchemaType } from "@/validators/auth-validator";
 
+import { queryClient } from "./QueryProvider";
+
 interface AuthContextType {
   user: any;
   accessToken: string | null;
@@ -41,6 +43,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     onSuccess: () => {
       setAccessToken(null);
       localStorage.removeItem("accessToken");
+
+      queryClient.clear();
+      window.location.href = "/login";
     },
   });
   return (

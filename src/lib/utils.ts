@@ -1,5 +1,4 @@
-import moment from "moment";
-// import "moment/locale/id";
+import { format } from "date-fns";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -19,8 +18,8 @@ export const getInitial = (name: string) => {
 };
 
 export const formatDateTime = (
-  isoString: string,
-  format: string = "DD MMM YYYY, hh:mm A"
+  date: string | Date,
+  formatString: string = "PP HH:mm"
 ) => {
-  return moment(isoString).utc().format(format);
+  return format(new Date(date), formatString);
 };

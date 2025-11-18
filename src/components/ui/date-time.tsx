@@ -28,6 +28,16 @@ export function DateTimePicker({
     value ? format(value, "HH:mm") : ""
   );
 
+  React.useEffect(() => {
+    if (value) {
+      setTempDate(value);
+      setTempTime(format(value, "HH:mm"));
+    } else {
+      setTempDate(undefined);
+      setTempTime("");
+    }
+  }, [value]);
+
   // Update final combined DateTime
   const updateDateTime = (selectedDate?: Date, selectedTime?: string) => {
     if (!selectedDate) {

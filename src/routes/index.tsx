@@ -5,6 +5,7 @@ import DashboardPage from "@/pages/dashboard";
 import TicketPage from "@/pages/ticket";
 import ProfilePage from "@/pages/profile";
 import NotFoundPage from "@/pages/not-found";
+import TicketDetailPage from "@/pages/ticket/detail";
 
 import Layout from "@/components/layout";
 
@@ -33,6 +34,7 @@ const Router = () => {
               element={<Navigate to="/ticket/IMT" replace />}
             />
             <Route path="/ticket/:category" element={<TicketPage />} />
+            <Route path="/ticket-detail/:id" element={<TicketDetailPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
