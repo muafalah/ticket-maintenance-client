@@ -22,6 +22,7 @@ import { DEFAULT_PAGINATION } from "@/lib/constants";
 
 import { columns } from "./columns";
 import { FilterDrawer } from "./filters";
+import { TicketFormDialog } from "./ticket-form-dialog";
 
 const initFilters = {
   status: undefined,
@@ -41,6 +42,7 @@ export const ListTicket = ({ category }: { category: TicketCategoryEnum }) => {
   ]);
   const [filters, setFilters] =
     useState<Record<string, string | undefined>>(initFilters);
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   const debouncedKeyword = useMemo(
     () => debounce((value: string) => setKeyword(value), 1000),
@@ -78,7 +80,7 @@ export const ListTicket = ({ category }: { category: TicketCategoryEnum }) => {
           </div>
           <FilterDrawer filters={filters} setFilters={setFilters} />
         </div>
-        <Button className="cursor-pointer" onClick={() => {}}>
+        <Button className="cursor-pointer" onClick={() => setIsOpenModal(true)}>
           <PlusCircle /> Create Ticket
         </Button>
       </div>
@@ -95,6 +97,10 @@ export const ListTicket = ({ category }: { category: TicketCategoryEnum }) => {
           setSorting={setSorting}
         />
       </div>
+
+      {isOpenModal && (
+        <TicketFormDialog open={isOpenModal} setOpen={setIsOpenModal} />
+      )}
     </div>
   );
 };

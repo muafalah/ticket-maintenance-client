@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
+import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 
 import {
@@ -35,10 +37,20 @@ const LoginForm = () => {
   const onSubmit = (value: LoginSchemaType) => {
     login.mutate(value, {
       onSuccess: () => {
+        toast.success("Logged in successfully");
         navigate("/dashboard");
+      },
+      onError: (err) => {
+        if (err instanceof AxiosError) {
+          toast.error(err.response?.data?.message);
+        } else {
+          toast.error("Something went wrong");
+        }
       },
     });
   };
+
+  const disabled = login.isPending;
 
   return (
     <Form {...form}>
@@ -57,7 +69,11 @@ const LoginForm = () => {
               <FormItem>
                 <FormLabel>Email Address</FormLabel>
                 <FormControl>
-                  <Input placeholder="Input your email address" {...field} />
+                  <Input
+                    placeholder="Input your email address"
+                    {...field}
+                    disabled={disabled}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -75,6 +91,7 @@ const LoginForm = () => {
                       type={isView ? "text" : "password"}
                       placeholder="Input your password"
                       {...field}
+                      disabled={disabled}
                     />
                     {isView ? (
                       <Eye
@@ -93,7 +110,12 @@ const LoginForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full mt-4" size="lg">
+          <Button
+            type="submit"
+            className="w-full mt-4 cursor-pointer"
+            size="lg"
+            disabled={disabled}
+          >
             Login
           </Button>
         </form>

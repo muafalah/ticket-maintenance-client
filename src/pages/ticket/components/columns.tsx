@@ -92,18 +92,8 @@ export const columns = (
       const criticality = row.getValue("criticality")
         ? `${row.getValue("criticality")}`
         : "";
-
-      const priorityColorMap: Record<TicketPriorityEnum, string> = {
-        LOW: "text-blue-500",
-        MEDIUM: "text-orange-500",
-        HIGH: "text-red-500",
-      };
-
       return (
-        <Badge
-          variant="outline"
-          className={`rounded-sm ${priorityColorMap[priority]}`}
-        >
+        <Badge variant="outline" className="rounded-sm">
           {`${priority} ${criticality}`}
         </Badge>
       );
@@ -121,6 +111,11 @@ export const columns = (
   {
     accessorKey: "reporterName",
     header: "Reporter",
+    cell: ({ row }) => {
+      const reporterName = row.getValue("reporterName") as string;
+
+      return reporterName || "-";
+    },
   },
   {
     accessorKey: "assignedTo",

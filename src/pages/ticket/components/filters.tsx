@@ -54,7 +54,7 @@ export const FilterDrawer = ({
                   }}
                 >
                   <SelectTrigger className="w-full cursor-pointer">
-                    <SelectValue placeholder="Pilih status..." />
+                    <SelectValue placeholder="Choose status..." />
                   </SelectTrigger>
                   <SelectContent>
                     {TICKET_STATUS.map((opt) => (
@@ -88,7 +88,7 @@ export const FilterDrawer = ({
                   }}
                 >
                   <SelectTrigger className="w-full cursor-pointer">
-                    <SelectValue placeholder="Pilih priority..." />
+                    <SelectValue placeholder="Choose priority..." />
                   </SelectTrigger>
                   <SelectContent>
                     {TICKET_PRIORITY.map((opt) => (
@@ -122,7 +122,7 @@ export const FilterDrawer = ({
                   }}
                 >
                   <SelectTrigger className="w-full cursor-pointer">
-                    <SelectValue placeholder="Pilih level..." />
+                    <SelectValue placeholder="Choose level..." />
                   </SelectTrigger>
                   <SelectContent>
                     {TICKET_LEVEL.map((opt) => (

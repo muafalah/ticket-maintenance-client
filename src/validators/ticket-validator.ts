@@ -39,4 +39,29 @@ export const ticketQuerySchema = ticketFilterSchema
   .extend(paginationSchema.shape)
   .extend(sorterSchema.shape);
 
+export const baseTicketSchema = z.object({
+  title: z.string().min(1, "Title is required").max(255),
+  description: z.string().optional(),
+  expectedCompletion: z.date({ message: "Date & Time is required" }),
+
+  category: z.enum(TicketCategoryEnum),
+  priority: z.enum(TicketPriorityEnum),
+  status: z.enum(TicketStatusEnum),
+
+  reporterName: z.string().optional(),
+  reporterContact: z.string().optional(),
+
+  attachments: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string(),
+      })
+    )
+    .optional(),
+});
+
+export const createTicketSchema = baseTicketSchema;
+
+export type CreateTicketSchemaType = z.infer<typeof createTicketSchema>;
 export type TicketQuerySchemaType = z.infer<typeof ticketQuerySchema>;
