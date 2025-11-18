@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import api from "@/lib/axios";
 
 import type { TicketQuerySchemaType } from "@/validators/ticket-validator";
@@ -19,7 +20,7 @@ export const createTicketApi = async (body: FormData) => {
   return res.data;
 };
 
-export const updateTicketByIdApi = async (id: string, body: FormData) => {
+export const updateTicketByIdApi = async (id: string, body: any) => {
   const res = await api.put(`/ticket/${id}`, body);
   return res.data;
 };

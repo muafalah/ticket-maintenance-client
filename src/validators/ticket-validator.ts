@@ -53,5 +53,12 @@ export const baseTicketSchema = z.object({
 
 export const createTicketSchema = baseTicketSchema;
 
+export const ticketFileUploaderSchema = z.object({
+  attachments: z.array(z.any()),
+});
+
 export type CreateTicketSchemaType = z.infer<typeof createTicketSchema>;
 export type TicketQuerySchemaType = z.infer<typeof ticketQuerySchema>;
+export type TicketFileUploaderSchemaType = z.infer<
+  typeof ticketFileUploaderSchema
+>;
