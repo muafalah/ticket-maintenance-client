@@ -1,73 +1,121 @@
-# React + TypeScript + Vite
+## Description
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for a Helpdesk Ticket Maintenance System, inspired by Jira. It provides a clean, structured UI/UX for users to manage support tickets with role-based access (L1: Helpdesk Agent, L2: Technical Support, L3: Advanced Support). Built with React, Vite, TypeScript, and Tailwind CSS, it integrates with the backend API for ticket creation, tracking, escalation, and resolution.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Role-Based Login**: Secure authentication with JWT, redirecting to role-specific dashboards.
+- **Ticket Management**: Create, view, update, and escalate tickets.
+- **Ticket List**: Filterable list by status, priority, and escalation level.
+- **Ticket Details**: View description, history, logs, and current status.
+- **Escalation**: Escalate tickets with notes, following L1 → L2 → L3 workflow.
+- **File Uploads**: Support for attachments with drag-and-drop.
+- **Responsive UI**: Clean, minimal design using Tailwind CSS and Radix UI components.
+- **Dark/Light Theme**: Theme switching with next-themes.
+- **Form Validation**: Zod-based validation with React Hook Form.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework**: React 19 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **UI Components**: Radix UI (Dialog, Dropdown, Tabs, etc.)
+- **State Management**: TanStack React Query for API calls
+- **Routing**: React Router
+- **Forms**: React Hook Form with Zod validation
+- **Icons**: Lucide React
+- **Date Handling**: date-fns, moment
+- **File Handling**: React Dropzone
+- **Other**: Axios for HTTP requests, Slate for rich text, Sonner for toasts
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Clone the repository:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+   ```
+   git clone <repository-url>
+   cd client
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2. Install dependencies:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+   ```
+   npm install
+   ```
+
+3. Set up environment variables. Create a `.env` file in the root directory with the following:
+
+   ```
+   VITE_API_BASE_URL=<your-backend-api-url>
+   ```
+
+4. Ensure the backend server is running (refer to backend README).
+
+## Usage
+
+### Development
+
+Run the development server with hot reloading:
+
+```
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app will run on `http://localhost:5173` (default Vite port).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Build for Production
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Build the app:
+
+```
+npm run build
+```
+
+Preview the build:
+
+```
+npm run preview
+```
+
+### Linting
+
+Check for linting issues:
+
+```
+npm run lint
+```
+
+### Example Credentials
+
+For testing purposes, use the following example login credentials (ensure these users are seeded in the backend database):
+
+- **L1 Helpdesk Agent**:
+
+  - Email: l1@mail.com
+  - Password: 12345678
+
+- **L2 Technical Support**:
+
+  - Email: l2@mail.com
+  - Password: 12345678
+
+- **L3 Advanced Support**:
+  - Email: l3@mail.com
+  - Password: 12345678
+
+## Project Structure
+
+```
+client/
+├── src/
+│   ├── components/      # Reusable UI components (e.g., buttons, dialogs)
+│   ├── pages/           # Page components (e.g., Login, TicketList, TicketDetail)
+│   ├── hooks/           # Custom React hooks
+│   ├── lib/             # Utilities (e.g., API client, utils)
+│   ├── types/           # TypeScript types
+│   ├── styles/          # Global styles and Tailwind config
+│   └── main.tsx         # Entry point
+├── public/              # Static assets
+├── index.html           # HTML template
+└── package.json
 ```
