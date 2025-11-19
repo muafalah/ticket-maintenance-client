@@ -108,14 +108,18 @@ For testing purposes, use the following example login credentials (ensure these 
 ```
 client/
 ├── src/
-│   ├── components/      # Reusable UI components (e.g., buttons, dialogs)
-│   ├── pages/           # Page components (e.g., Login, TicketList, TicketDetail)
-│   ├── hooks/           # Custom React hooks
-│   ├── lib/             # Utilities (e.g., API client, utils)
-│   ├── types/           # TypeScript types
-│   ├── styles/          # Global styles and Tailwind config
-│   └── main.tsx         # Entry point
-├── public/              # Static assets
-├── index.html           # HTML template
-└── package.json
+│   ├── components/      # Reusable UI components, such as buttons, modals, headers, and other visual elements that can be used across different pages.
+│   ├── pages/           # Page-level components representing full screens or views (e.g., Login page, Ticket List page, Ticket Detail page).
+│   ├── hooks/           # Custom React hooks for state management, API calls, or other reusable logic.
+│   ├── lib/             # Utility functions and libraries, such as API clients, formatters, or helper functions.
+│   ├── pages/           # (Duplicate, might need cleanup) Page components for routing.
+│   ├── providers/       # React context providers for global state, authentication, theming, or other app-wide data.
+│   ├── routes/          # Routing definitions for the application, mapping paths to page components.
+│   ├── services/        # Services for interacting with APIs or external systems (e.g., fetch tickets, user authentication).
+│   ├── validators/      # Validation logic for forms or data (e.g., email format, required fields, password strength).
+│   └── main.tsx         # Entry point of the React application, where the app is rendered to the DOM.
+├── public/              # Public/static assets like images, favicon, and files accessible directly from the web.
+├── index.html           # HTML template used by React to inject the application bundle.
+└── package.json         # Contains project metadata, dependencies, and scripts for building and running the app.
+
 ```
