@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { TrashIcon, Upload } from "lucide-react";
 import { type UseMutateFunction } from "@tanstack/react-query";
 
@@ -6,7 +7,7 @@ import { ImageZoom } from "@/components/ui/image-zoom";
 import { Button } from "@/components/ui/button";
 
 import type { TicketLevelEnum } from "@/validators/ticket-validator";
-import { useState } from "react";
+
 import { TicketFileUploader } from "./uploader";
 
 type RemoveAttachmentPayload = {
@@ -111,13 +112,15 @@ const Attachments = ({
         ))}
       </Tabs>
 
-      <Button
-        size="icon-lg"
-        className="absolute top-2 right-2 p-2 rounded-md border bg-white hover:bg-gray-200 transition cursor-pointer"
-        onClick={() => setIsOpen(true)}
-      >
-        <Upload className="w-5 h-5 text-black" />
-      </Button>
+      {!disabled && (
+        <Button
+          size="icon-lg"
+          className="absolute top-2 right-2 p-2 rounded-md border bg-white hover:bg-gray-200 transition cursor-pointer"
+          onClick={() => setIsOpen(true)}
+        >
+          <Upload className="w-5 h-5 text-black" />
+        </Button>
+      )}
 
       <TicketFileUploader id={id} open={isOpen} setOpen={setIsOpen} />
     </div>

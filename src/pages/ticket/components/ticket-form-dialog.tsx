@@ -86,6 +86,7 @@ export const TicketFormDialog = ({
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["getTickets"] });
       queryClient.invalidateQueries({ queryKey: ["getTicketById"] });
+      queryClient.invalidateQueries({ queryKey: ["getTicketHistory"] });
 
       form.reset();
       setOpen(false);

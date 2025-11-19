@@ -25,7 +25,21 @@ export const updateTicketByIdApi = async (id: string, body: any) => {
   return res.data;
 };
 
+export const escalateTicketByIdApi = async (id: string, body: any) => {
+  const res = await api.put(`/ticket/${id}/escalate`, body);
+  return res.data;
+};
+
 export const deleteTicketByIdApi = async (id: string) => {
   const res = await api.delete(`/ticket/${id}`);
+  return res.data;
+};
+
+export const getTicketHistoryApi = async (ticketId: string) => {
+  const res = await api.get("/ticket-history", {
+    params: {
+      ticketId,
+    },
+  });
   return res.data;
 };

@@ -12,7 +12,7 @@ import { queryClient } from "@/providers/QueryProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { DialogConfirm } from "@/components/ui/dialog-confirm";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 import { deleteTicketByIdApi, getTicketByIdApi } from "@/services/ticket";
 
@@ -164,12 +164,18 @@ export const columns = (
     id: "action",
     header: "Action",
     cell: ({ row }) => {
-      return <ActionButton key={row.original._id} id={row.original._id} />;
+      return (
+        <ActionButton
+          key={row.original._id}
+          id={row.original._id}
+          status={row.original.status}
+        />
+      );
     },
   },
 ];
 
-const ActionButton = ({ id }: { id: string }) => {
+const ActionButton = ({ id, status }: { id: string; status: string }) => {
   const navigate = useNavigate();
 
   const [isOpenModalUpdate, setOpenModalUpdate] = useState(false);
@@ -199,21 +205,36 @@ const ActionButton = ({ id }: { id: string }) => {
     },
   });
 
+  const disabled = status === "COMPLETED";
+
   return (
     <>
-      <div className="flex gap-4">
-        <Eye
+      <div className="flex">
+        <Button
+          size="icon-sm"
+          variant="link"
+          className="text-black cursor-pointer"
           onClick={() => navigate(`/ticket-detail/${id}`)}
-          className="size-4 cursor-pointer"
-        />
-        <SquarePen
+        >
+          <Eye className="size-4 cursor-pointer" />
+        </Button>
+        <Button
+          size="icon-sm"
+          variant="link"
+          className="text-black cursor-pointer"
           onClick={() => setOpenModalUpdate(true)}
-          className="size-4 cursor-pointer"
-        />
-        <Trash2
+          disabled={disabled}
+        >
+          <SquarePen className="size-4 cursor-pointer" />
+        </Button>
+        <Button
+          size="icon-sm"
+          variant="link"
+          className="text-red-500 cursor-pointer"
           onClick={() => setOpenModalDelete(true)}
-          className="size-4 cursor-pointer text-red-500"
-        />
+        >
+          <Trash2 className="size-4 cursor-pointer" />
+        </Button>
       </div>
       {isOpenModalUpdate && ticketData?.data && (
         <TicketFormDialog

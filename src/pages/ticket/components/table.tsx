@@ -23,6 +23,7 @@ import { DEFAULT_PAGINATION } from "@/lib/constants";
 import { columns } from "./columns";
 import { FilterDrawer } from "./filters";
 import { TicketFormDialog } from "./ticket-form-dialog";
+import { useAuth } from "@/hooks/useAuth";
 
 const initFilters = {
   status: undefined,
@@ -31,6 +32,8 @@ const initFilters = {
 };
 
 export const ListTicket = ({ category }: { category: TicketCategoryEnum }) => {
+  const { user } = useAuth();
+
   const [keyword, setKeyword] = useState<string>("");
   const [pagination, setPagination] =
     useState<PaginationState>(DEFAULT_PAGINATION);
@@ -80,9 +83,14 @@ export const ListTicket = ({ category }: { category: TicketCategoryEnum }) => {
           </div>
           <FilterDrawer filters={filters} setFilters={setFilters} />
         </div>
-        <Button className="cursor-pointer" onClick={() => setIsOpenModal(true)}>
-          <PlusCircle /> Create Ticket
-        </Button>
+        {user?.role === "L1" && (
+          <Button
+            className="cursor-pointer"
+            onClick={() => setIsOpenModal(true)}
+          >
+            <PlusCircle /> Create Ticket
+          </Button>
+        )}
       </div>
 
       <div>

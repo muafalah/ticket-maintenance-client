@@ -1,9 +1,9 @@
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
-import { useState } from "react";
 
 import { queryClient } from "@/providers/QueryProvider";
 
@@ -68,7 +68,7 @@ const FormComment = ({
     mutationFn: (body: CreateTicketCommentSchemaType) =>
       createTicketCommentApi(body),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["getTicketComments"] });
+      queryClient.invalidateQueries({ queryKey: ["getTicketComments", id] });
 
       form.reset();
 
@@ -87,9 +87,8 @@ const FormComment = ({
     mutationFn: (body: CreateTicketCommentSchemaType) =>
       updateTicketCommentApi(commentId!, body),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["getTicketComments"] });
+      queryClient.invalidateQueries({ queryKey: ["getTicketComments", id] });
 
-      form.reset();
       setDisabled(true);
 
       toast.success(data.message);
@@ -106,7 +105,8 @@ const FormComment = ({
   const { mutate: mutateDelete } = useMutation({
     mutationFn: () => deleteTicketCommentByIdApi(commentId!),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["getTicketComments"] });
+      queryClient.invalidateQueries({ queryKey: ["getTicketComments", id] });
+
       toast.success(data.message);
     },
     onError: (err) => {
@@ -125,6 +125,15 @@ const FormComment = ({
       createComment(value);
     }
   };
+
+  useEffect(() => {
+    // Ini akan dipanggil setiap kali prop 'comment' atau 'id' berubah
+    // (misalnya setelah data di-refetch di ListComment)
+    form.reset({
+      ticketId: id,
+      comment: comment || "",
+    });
+  }, [comment, id, form]);
 
   const profilePicture = user?.profilePicture || currUser?.profilePicture;
   const name = user?.name || currUser?.name;

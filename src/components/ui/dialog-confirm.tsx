@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 interface ConfirmModalProps {
   isOpen: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  isLoading: boolean;
+  isLoading?: boolean;
   title: string;
   description: string;
   confirmBtnLabel: string;

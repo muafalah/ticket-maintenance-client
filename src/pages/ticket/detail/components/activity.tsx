@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import FormComment from "./form-comment";
 import ListComment from "./list-comment";
+import ListHistory from "./list-history";
 
 const Activity = ({ id }: { id: string }) => {
   return (
@@ -23,7 +24,7 @@ const Activity = ({ id }: { id: string }) => {
           <FormComment id={id} />
         </TabsContent>
         <TabsContent value="history" className="py-2">
-          History L
+          <ListHistory id={id} />
         </TabsContent>
       </Tabs>
     </div>

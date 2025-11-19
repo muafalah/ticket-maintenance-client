@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from "react";
 import { useParams } from "react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { SquarePen, Trash2 } from "lucide-react";
@@ -10,11 +11,15 @@ import { queryClient } from "@/providers/QueryProvider";
 import { PageWrapper } from "@/components/layout/page-wrapper";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 import { useAuth } from "@/hooks/useAuth";
 
-import { getTicketByIdApi, updateTicketByIdApi } from "@/services/ticket";
+import {
+  deleteTicketByIdApi,
+  getTicketByIdApi,
+  updateTicketByIdApi,
+} from "@/services/ticket";
 
 import type { TicketStatusEnum } from "@/validators/ticket-validator";
 
@@ -22,6 +27,8 @@ import Attachments from "./components/attachments";
 import SideAction from "./components/side-action";
 import Information from "./components/information";
 import Activity from "./components/activity";
+import { TicketFormDialog } from "../components/ticket-form-dialog";
+import { DialogConfirm } from "@/components/ui/dialog-confirm";
 
 const statusColorMap: Record<TicketStatusEnum, string> = {
   NEW: "bg-gray-100",
@@ -30,8 +37,11 @@ const statusColorMap: Record<TicketStatusEnum, string> = {
 };
 
 const TicketDetailPage = () => {
-  const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { id } = useParams<{ id: string }>();
+
+  const [isOpenModalUpdate, setOpenModalUpdate] = useState(false);
+  const [isOpenModalDelete, setOpenModalDelete] = useState(false);
 
   const { data, isFetched } = useQuery({
     queryKey: ["getTicketById", id],
@@ -46,6 +56,8 @@ const TicketDetailPage = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["getTickets"] });
       queryClient.invalidateQueries({ queryKey: ["getTicketById", id] });
+      queryClient.invalidateQueries({ queryKey: ["getTicketHistory"] });
+
       toast.success(data.message);
     },
     onError: (err) => {
@@ -54,6 +66,24 @@ const TicketDetailPage = () => {
       } else {
         toast.error("Something went wrong");
       }
+    },
+  });
+
+  const { mutate: mutateDelete, isPending } = useMutation({
+    mutationFn: () => deleteTicketByIdApi(id!),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["getTickets"] });
+      toast.success(data.message);
+    },
+    onError: (err) => {
+      if (err instanceof AxiosError) {
+        toast.error(err.response?.data?.message);
+      } else {
+        toast.error("Something went wrong");
+      }
+    },
+    onSettled: () => {
+      setOpenModalDelete(false);
     },
   });
 
@@ -76,9 +106,10 @@ const TicketDetailPage = () => {
   ];
 
   const disabled =
-    ticketData?.level === "L1"
+    (ticketData?.level === "L1"
       ? user?._id !== ticketData?.createdBy
-      : user?._id !== ticketData?.assignedTo;
+      : user?._id !== ticketData?.assignedTo) ||
+    ticketData?.status === "COMPLETED";
 
   if (!isFetched) {
     return (
@@ -103,11 +134,21 @@ const TicketDetailPage = () => {
           <h1 className="font-semibold text-2xl">{ticketData?.code}</h1>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="cursor-pointer">
+          <Button
+            variant="outline"
+            className="cursor-pointer"
+            disabled={disabled}
+            onClick={() => setOpenModalUpdate(true)}
+          >
             <SquarePen />
             <span className="font-normal hidden md:inline">Edit</span>
           </Button>
-          <Button variant="outline" className="cursor-pointer text-red-500">
+          <Button
+            variant="outline"
+            className="cursor-pointer text-red-500"
+            disabled={disabled}
+            onClick={() => setOpenModalDelete(true)}
+          >
             <Trash2 />
             <span className="font-normal hidden md:inline">Delete</span>
           </Button>
@@ -134,6 +175,7 @@ const TicketDetailPage = () => {
         <div className="col-span-3 lg:col-span-1">
           {ticketData && (
             <SideAction
+              id={id!}
               level={ticketData?.level}
               priority={ticketData?.priority}
               criticality={ticketData?.criticality}
@@ -150,6 +192,28 @@ const TicketDetailPage = () => {
           <Activity id={id!} />
         </div>
       </div>
+
+      {isOpenModalUpdate && ticketData && (
+        <TicketFormDialog
+          key={ticketData?._id}
+          id={id}
+          initData={ticketData}
+          open={isOpenModalUpdate}
+          setOpen={setOpenModalUpdate}
+        />
+      )}
+      {isOpenModalDelete && (
+        <DialogConfirm
+          isOpen={isOpenModalDelete}
+          setOpen={setOpenModalDelete}
+          isLoading={isPending}
+          title="Are you sure you want to delete it?"
+          description="This action cannot be undone. This will permanently delete your ticket."
+          confirmBtnLabel="Delete"
+          confirmBtnClassName={buttonVariants({ variant: "destructive" })}
+          onConfirm={() => mutateDelete()}
+        />
+      )}
     </PageWrapper>
   );
 };
