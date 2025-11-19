@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import api from "@/lib/axios";
 
-import type { TicketQuerySchemaType } from "@/validators/ticket-validator";
+import type {
+  TicketCategoryEnum,
+  TicketQuerySchemaType,
+} from "@/validators/ticket-validator";
 
 export const getTicketsApi = async (params: TicketQuerySchemaType) => {
   const res = await api.get("/ticket", {
@@ -39,6 +42,24 @@ export const getTicketHistoryApi = async (ticketId: string) => {
   const res = await api.get("/ticket-history", {
     params: {
       ticketId,
+    },
+  });
+  return res.data;
+};
+
+export const getTicketSummaryApi = async (category: TicketCategoryEnum) => {
+  const res = await api.get("/summary", {
+    params: {
+      category,
+    },
+  });
+  return res.data;
+};
+
+export const getOverdueTicketsApi = async (category: TicketCategoryEnum) => {
+  const res = await api.get("/summary/overdue", {
+    params: {
+      category,
     },
   });
   return res.data;

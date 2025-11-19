@@ -23,6 +23,7 @@ const ListHistory = ({ id }: { id: string }) => {
     attachments: "Attachments",
     reporterName: "Reporter Name",
     reporterContact: "Reporter Contact",
+    ticket: "Ticket",
   };
 
   return (

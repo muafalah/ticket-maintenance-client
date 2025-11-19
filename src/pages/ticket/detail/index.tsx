@@ -90,7 +90,7 @@ const TicketDetailPage = () => {
   const breadcrumb = [
     {
       label: "Dashboard",
-      href: "/",
+      href: "/dashboard",
     },
     {
       label: "My Tickets",

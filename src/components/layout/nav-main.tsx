@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { ChevronRight, CircleUserRound, House, Ticket } from "lucide-react";
+import { ChevronRight, House, Ticket } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -52,11 +52,6 @@ const NAV_LIST = [
         title: "My Tickets",
         icon: Ticket,
         items: NAV_TICKET_LIST,
-      },
-      {
-        title: "Profile",
-        url: "/profile",
-        icon: CircleUserRound,
       },
     ],
   },
